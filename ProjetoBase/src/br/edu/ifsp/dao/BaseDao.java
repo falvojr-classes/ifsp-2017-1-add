@@ -1,6 +1,9 @@
 package br.edu.ifsp.dao;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Classe base para os DAO's.
@@ -21,4 +24,20 @@ public class BaseDao {
         return ConnectionManager.getInstancia().getConexao();
     }
 
+    /**
+     * Método útil para a recuperação da chave primária gerada a partir de um
+     * PreparedStatement.
+     *
+     * @param statement PreparedStatement criado usando a constante Statement.RETURN_GENERATED_KEYS.
+     *
+     * @return Long que representa a chave primária gerada.
+     * 
+     * @throws java.sql.SQLException
+     */
+    protected Long getIdGerado(PreparedStatement comando) throws SQLException {
+        ResultSet chavesGeradas = comando.getGeneratedKeys();
+        chavesGeradas.next();
+        Long idGerado = chavesGeradas.getLong(1);
+        return idGerado;
+    }
 }

@@ -14,8 +14,6 @@ import java.sql.SQLException;
  * @since 14/03/2017
  */
 public final class ConnectionManager {
-
-    /* INICIO Singleton "Apressado" */
     
     private static final ConnectionManager instancia = new ConnectionManager();
 
@@ -27,8 +25,6 @@ public final class ConnectionManager {
         // Atributo setado uma única vez (devido ao Singleton)
         this.conexao = this.newConnection();
     }
-    
-    /* FIM Singleton "Apressado" */
     
     private final Connection conexao;
 

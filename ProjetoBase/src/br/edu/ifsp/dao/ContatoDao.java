@@ -3,8 +3,13 @@ package br.edu.ifsp.dao;
 import java.util.List;
 
 import br.edu.ifsp.model.Contato;
+import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Classe de persistência para a entidade Contato. Essa classe implementa os
@@ -15,51 +20,86 @@ import java.sql.SQLException;
  * @since 14/03/2017
  */
 public class ContatoDao extends BaseDao implements IContatoDao {
-
-    /* INICIO Singleton "Preguicoso" */
     
-    private static ContatoDao instancia;
+    private static final ContatoDao instancia = new ContatoDao();
 
     public static ContatoDao getInstancia() {
-        if (ContatoDao.instancia == null) {
-            ContatoDao.instancia = new ContatoDao();
-        }
         return ContatoDao.instancia;
     }
 
     private ContatoDao() {
         super();
     }
-
-    /* FIM Singleton "Preguicoso" */
     
     @Override
-    public void inserir(Contato entidade) {
+    public void inserir(Contato entidade) throws SQLException {
         String sql = "INSERT INTO contatos "
                 + "(nome, email, telefone, data_nascimento)  "
                 + "VALUES  "
                 + "(?, ?, ?, ?);";
-        try {
-            PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        PreparedStatement comando = super.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        comando.setString(1, entidade.getNome());
+        comando.setString(2, entidade.getEmail());
+        comando.setString(3, entidade.getTelefone());
+        Date data = new Date(entidade.getDataNascimento().getTimeInMillis());
+        comando.setDate(4, data);
+        comando.execute();
+        
+        Long idGerado = super.getIdGerado(comando);
+        entidade.setId(idGerado);
+        
+        comando.close();
+    }
+
+    @Override
+    public void alterar(Contato entidade) throws SQLException {
+        String sql = "UPDATE contatos SET" +
+                        " nome = ?," +
+                        " email = ?," +
+                        " telefone = ?," +
+                        " data_nascimento = ?" +
+                        " WHERE id = ?";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setString(1, entidade.getNome());
+        comando.setString(2, entidade.getEmail());
+        comando.setString(3, entidade.getTelefone());
+        Date data = new Date(entidade.getDataNascimento().getTimeInMillis());
+        comando.setDate(4, data);
+        comando.setLong(5, entidade.getId());
+        comando.execute();
+        comando.close();
+    }
+
+    @Override
+    public void deletar(Contato entidade) throws SQLException {
+        String sql = "DELETE FROM contatos WHERE id = ?";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setLong(1, entidade.getId());
+        comando.execute();
+        comando.close();
+    }
+
+    @Override
+    public List<Contato> listar() throws SQLException {
+        List<Contato> contatos = new ArrayList<>();
+        String sql = "SELECT * FROM contatos";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        ResultSet resultados = comando.executeQuery();
+        while (resultados.next()) {            
+            Contato contato = new Contato();
+            contato.setNome(resultados.getString("nome"));
+            contato.setEmail(resultados.getString("email"));
+            contato.setTelefone(resultados.getString("telefone"));
+            Date dataSql = resultados.getDate("data_nascimento");
+            Calendar dataNascimento = Calendar.getInstance();
+            dataNascimento.setTime(dataSql);
+            contato.setDataNascimento(dataNascimento);
             
-        } catch (SQLException sqlException) {
-            throw new RuntimeException(sqlException);
+            contatos.add(contato);
         }
-    }
-
-    @Override
-    public void alterar(Contato entidade) {
- 
-    }
-
-    @Override
-    public void deletar(Contato entidade) {
-
-    }
-
-    @Override
-    public List<Contato> listar() {
-        return null;
+        resultados.close();
+        comando.close();
+        return contatos;
     }
 
 }
