@@ -33,9 +33,9 @@ public final class ConnectionManager {
     }
 
     /**
-     * Basta invocar esse método para recebermos uma NOVA conexão pronta para
-     * uso. Por isso, limitamos essa chamada ao construtor da classe
-     * ConnectionManager, que implementa o padrão de projeto Singleton.
+     * Cria uma NOVA conexão pronta para uso. Por isso, limitamos essa 
+     * chamada ao construtor da classe ConnectionManager, que implementa 
+     * o padrão de projeto Singleton.
      *
      * @return conexão do tipo Connection.
      */

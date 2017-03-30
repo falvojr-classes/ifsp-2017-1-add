@@ -1,7 +1,7 @@
 package br.edu.ifsp;
 
+import br.edu.ifsp.controller.ContatoController;
 import br.edu.ifsp.dao.ContatoDao;
-import br.edu.ifsp.dao.IContatoDao;
 import br.edu.ifsp.model.Contato;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -15,7 +15,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) throws SQLException {
-        IContatoDao dao = ContatoDao.getInstancia();
+        ContatoController controller = ContatoController.getInstancia();
         
         Contato entidade = new Contato();
         entidade.setNome("Venilton 2");
@@ -23,24 +23,24 @@ public class Main {
         entidade.setTelefone("16 99721-8281");
         entidade.setDataNascimento(Calendar.getInstance());
         
-        dao.inserir(entidade);
+        controller.inserir(entidade);
         
         String msgInserir = String.format("Contato %d inserido!", entidade.getId());
         System.out.println(msgInserir);
         
         entidade.setNome("Contato Alterado");
         entidade.setEmail("");
-        dao.alterar(entidade);
+        controller.alterar(entidade);
         
         String msgAlterar = String.format("Contato %d alterado!", entidade.getId());
         System.out.println(msgAlterar);
         
-        dao.deletar(entidade);
+        controller.deletar(entidade);
         
         String msgDeletar = String.format("Contato %d deletado!", entidade.getId());
         System.out.println(msgDeletar);
         
-        List<Contato> lista = dao.listar();
+        List<Contato> lista = controller.listar();
         
         String msgListar = String.format("Contatos existentes: %d", lista.size());
         System.out.println(msgListar);

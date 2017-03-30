@@ -1,5 +1,6 @@
 package br.edu.ifsp.dao;
 
+import br.edu.ifsp.util.ICrud;
 import java.util.List;
 
 import br.edu.ifsp.model.Contato;
@@ -19,17 +20,21 @@ import java.util.Calendar;
  *
  * @since 14/03/2017
  */
-public class ContatoDao extends BaseDao implements IContatoDao {
+public class ContatoDao extends BaseDao implements ICrud<Contato>{
+    
+    /* INICIO Singleton "Apressado" */
     
     private static final ContatoDao instancia = new ContatoDao();
 
     public static ContatoDao getInstancia() {
-        return ContatoDao.instancia;
+        return instancia;
     }
 
     private ContatoDao() {
         super();
     }
+    
+    /* FIM Singleton "Apressado" */
     
     @Override
     public void inserir(Contato entidade) throws SQLException {

@@ -12,10 +12,10 @@ import java.sql.SQLException;
  * 
  * @since 14/03/2017
  */
-public class BaseDao {
+public abstract class BaseDao {
 
     /**
-     * Método que recupera uma instância única de Connection usando a classe
+     * Recupera uma instância única de Connection usando a classe
      * ConnectionManager.
      *
      * @return instância única de Connection.
@@ -25,7 +25,7 @@ public class BaseDao {
     }
 
     /**
-     * Método útil para a recuperação da chave primária gerada a partir de um
+     * Funcão útil para a recuperação da chave primária gerada a partir de um
      * PreparedStatement.
      *
      * @param statement PreparedStatement criado usando a constante Statement.RETURN_GENERATED_KEYS.
@@ -39,5 +39,13 @@ public class BaseDao {
         chavesGeradas.next();
         Long idGerado = chavesGeradas.getLong(1);
         return idGerado;
+    }
+    
+    public void iniciarTransacao() throws SQLException {
+        this.getConexao().setAutoCommit(false);
+    }
+    
+    public void finalizarTransacao() throws SQLException {
+        this.getConexao().commit();
     }
 }
