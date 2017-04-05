@@ -7,7 +7,8 @@ import br.edu.ifsp.util.ICrud;
 import java.sql.SQLException;
 
 /**
- *
+ * Classe responsável pelas regras e tratamentos de Contato.
+ * 
  * @author falvojr
  */
 public final class ContatoController implements ICrud<Contato>{
@@ -32,7 +33,11 @@ public final class ContatoController implements ICrud<Contato>{
     @Override
     public void inserir(Contato entidade) {
         try {
-            ContatoDao.getInstancia().inserir(entidade);
+            if (entidade.getEmail().isEmpty()) {
+                //TODO Erro!
+            } else {
+                ContatoDao.getInstancia().inserir(entidade);
+            }
         } catch (SQLException sqlException) {
             //TODO Tratar excecao especifica.
         } catch (Exception exception) {
