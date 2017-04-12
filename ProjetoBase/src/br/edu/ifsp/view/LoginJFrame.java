@@ -5,8 +5,11 @@
  */
 package br.edu.ifsp.view;
 
+import br.edu.ifsp.controller.ContatoController;
+import br.edu.ifsp.controller.UsuarioController;
 import br.edu.ifsp.model.Usuario;
 import br.edu.ifsp.util.ExcecaoNegocial;
+import br.edu.ifsp.util.Mensagens;
 
 /**
  *
@@ -90,8 +93,10 @@ public class LoginJFrame extends javax.swing.JFrame {
             Usuario usuario = new Usuario();
             usuario.setLogin(txtLogin.getText());
             usuario.setSenha(String.valueOf(txtSenha.getPassword()));
+            UsuarioController.getInstancia().autenticar(usuario);
+            Mensagens.info(this, Mensagens.USUARIO_SUCESSO_LOGIN);
         } catch(ExcecaoNegocial excecaoNegocial) {
-            
+            Mensagens.erro(this, excecaoNegocial);
         }
     }//GEN-LAST:event_btnLoginActionPerformed
 

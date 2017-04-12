@@ -24,10 +24,10 @@ public class ContatoDao extends BaseDao implements ICrud<Contato>{
     
     /* INICIO Singleton "Apressado" */
     
-    private static final ContatoDao instancia = new ContatoDao();
+    private static final ContatoDao INSTANCIA = new ContatoDao();
 
     public static ContatoDao getInstancia() {
-        return instancia;
+        return INSTANCIA;
     }
 
     private ContatoDao() {

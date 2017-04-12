@@ -2,6 +2,16 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/dao/ConnectionManager.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/util/Mensagens.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/dao/BaseDao.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/dao/ContatoDao.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/view/LoginJFrame.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/controller/ContatoController.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/Main.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/controller/UsuarioController.java</file>
+            <file>file:/home/falvojr/Git/falvojr-coach/ifsp-2017-1-add/ProjetoBase/src/br/edu/ifsp/dao/UsuarioDao.java</file>
+        </group>
     </open-files>
 </project-private>

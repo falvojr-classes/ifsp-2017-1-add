@@ -2,8 +2,10 @@ package br.edu.ifsp.controller;
 
 import br.edu.ifsp.dao.ContatoDao;
 import br.edu.ifsp.model.Contato;
+import br.edu.ifsp.util.ExcecaoNegocial;
 import java.util.List;
 import br.edu.ifsp.util.ICrud;
+import br.edu.ifsp.util.Mensagens;
 import java.sql.SQLException;
 
 /**
@@ -33,10 +35,13 @@ public final class ContatoController implements ICrud<Contato>{
     @Override
     public void inserir(Contato entidade) {
         try {
-            if (entidade.getEmail().isEmpty()) {
-                //TODO Erro!
-            } else {
+            boolean emailValido = !entidade.getEmail().isEmpty();
+            boolean nomeValido = !entidade.getNome().isEmpty();
+            boolean telefoneValido = !entidade.getTelefone().isEmpty();
+            if (emailValido || nomeValido || telefoneValido) {
                 ContatoDao.getInstancia().inserir(entidade);
+            } else {
+                throw new ExcecaoNegocial(Mensagens.CONTATO_ERRO_CAMPOS_OBRIGATORIOS);
             }
         } catch (SQLException sqlException) {
             //TODO Tratar excecao especifica.

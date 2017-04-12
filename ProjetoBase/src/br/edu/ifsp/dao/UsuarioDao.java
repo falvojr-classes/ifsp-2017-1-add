@@ -16,10 +16,10 @@ public class UsuarioDao extends BaseDao {
     
     /* INICIO Singleton "Apressado" */
     
-    private static final UsuarioDao instancia = new UsuarioDao();
+    private static final UsuarioDao INSTANCIA = new UsuarioDao();
 
     public static UsuarioDao getInstancia() {
-        return instancia;
+        return INSTANCIA;
     }
 
     private UsuarioDao() {
@@ -30,7 +30,8 @@ public class UsuarioDao extends BaseDao {
 
     public boolean autenticar(Usuario usuario) throws SQLException {
         boolean retorno = false;
-        String sql = "SELECT id FROM usuarios WHERE login = ? AND senha = ? AND ativo = true";
+        String sql = "SELECT id FROM usuarios WHERE login = ? AND senha = ? "
+                + "AND ativo = true";
         PreparedStatement comando = super.getConexao().prepareStatement(sql);
         comando.setString(1, usuario.getLogin());
         comando.setString(2, usuario.getSenha());
@@ -38,6 +39,7 @@ public class UsuarioDao extends BaseDao {
         if (resultados.next()) {
             retorno = true;
             usuario.setId(resultados.getLong("id"));
+            usuario.setAtivo(true);
         }
         comando.close();
         return retorno;
