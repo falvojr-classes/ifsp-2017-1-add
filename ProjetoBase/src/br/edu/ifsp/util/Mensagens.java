@@ -10,8 +10,9 @@ import javax.swing.JOptionPane;
  */
 public final class Mensagens {
     
-    public static final String ERRO_BD = "Ocorreu um erro no banco de dados!";
-    public static final String ERRO_INESPERADO = "Ocorreu um erro inesperado!";
+    public static final String ERRO_BD = "Erro no banco de dados!";
+    public static final String ERRO_INESPERADO = "Erro inesperado!";
+    public static final String ERRO_EMAIL = "Erro ao validar seu email!";
     
     public static final String USUARIO_SUCESSO_LOGIN = "Credenciais válidas!";
     public static final String USUARIO_ERRO_LOGIN = "Credenciais inválidas!";

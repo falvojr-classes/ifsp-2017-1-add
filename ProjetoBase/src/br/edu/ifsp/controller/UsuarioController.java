@@ -30,7 +30,7 @@ public final class UsuarioController {
     
     /* FIM Singleton "Preguicoso" */
     
-    public void autenticar(Usuario usuario) {
+    public void autenticar(Usuario usuario) throws ExcecaoNegocial {
         try {
             if (usuario.getLogin().isEmpty() || usuario.getSenha().isEmpty()) {
                 throw new ExcecaoNegocial(Mensagens.USUARIO_ERRO_CAMPOS_OBRIGATORIOS);

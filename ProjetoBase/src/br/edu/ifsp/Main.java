@@ -18,9 +18,9 @@ public class Main {
         ContatoController controller = ContatoController.getInstancia();
         
         Contato entidade = new Contato();
-        entidade.setNome("Venilton 2");
-        entidade.setEmail("venilton.junior@ifsp.edu.br");
-        entidade.setTelefone("16 99721-8281");
+        entidade.setNome("a");
+        entidade.setEmail("");
+        entidade.setTelefone("");
         entidade.setDataNascimento(Calendar.getInstance());
         
         controller.inserir(entidade);

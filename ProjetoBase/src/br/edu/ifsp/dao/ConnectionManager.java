@@ -1,7 +1,5 @@
 package br.edu.ifsp.dao;
 
-import br.edu.ifsp.util.ExcecaoNegocial;
-import br.edu.ifsp.util.Mensagens;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -48,6 +46,6 @@ public final class ConnectionManager {
      * @return conexão do tipo Connection.
      */
     private Connection newConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/agenda", "roota", "select*from0");
+        return DriverManager.getConnection("jdbc:mysql://localhost/agenda", "root", "select*from0");
     }
 }
