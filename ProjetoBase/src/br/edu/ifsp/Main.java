@@ -1,11 +1,10 @@
 package br.edu.ifsp;
 
 import br.edu.ifsp.controller.ContatoController;
-import br.edu.ifsp.dao.ContatoDao;
 import br.edu.ifsp.model.Contato;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.List;
+import org.joda.time.DateTime;
 
 /**
  * Classe principal para testes.
@@ -21,7 +20,7 @@ public class Main {
         entidade.setNome("a");
         entidade.setEmail("");
         entidade.setTelefone("");
-        entidade.setDataNascimento(Calendar.getInstance());
+        entidade.setDataNascimento(new DateTime());
         
         controller.inserir(entidade);
         

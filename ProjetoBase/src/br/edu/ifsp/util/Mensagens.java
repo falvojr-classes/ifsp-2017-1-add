@@ -18,7 +18,7 @@ public final class Mensagens {
     public static final String USUARIO_ERRO_LOGIN = "Credenciais inválidas!";
     public static final String USUARIO_ERRO_CAMPOS_OBRIGATORIOS = "Preencha Login e Senha!";
     
-    public static final String CONTATO_SUCESSO_INSERCAO = "";
+    public static final String CONTATO_SUCESSO_INSERCAO = "Contato inserido com sucesso!";
     public static final String CONTATO_SUCESSO_ALTERACAO = "";
     public static final String CONTATO_SUCESSO_EXCLUSAO = "";
     public static final String CONTATO_ERRO_CAMPOS_OBRIGATORIOS = "Ao menos um campo deve ser preenchido!";

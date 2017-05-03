@@ -1,6 +1,7 @@
 package br.edu.ifsp.model;
 
 import java.util.Calendar;
+import org.joda.time.DateTime;
 
 /**
  * Entidade que representa um contato.
@@ -14,7 +15,7 @@ public class Contato {
     private String nome;
     private String email;
     private String telefone;
-    private Calendar dataNascimento;
+    private DateTime dataNascimento;
 
     public Long getId() {
         return id;
@@ -48,11 +49,11 @@ public class Contato {
         this.telefone = telefone;
     }
 
-    public Calendar getDataNascimento() {
+    public DateTime getDataNascimento() {
         return dataNascimento;
     }
 
-    public void setDataNascimento(Calendar dataNascimento) {
+    public void setDataNascimento(DateTime dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
     

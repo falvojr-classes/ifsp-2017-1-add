@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Calendar;
+import org.joda.time.DateTime;
 
 /**
  * Classe de persistência para a entidade Contato. Essa classe implementa os
@@ -46,7 +47,7 @@ public class ContatoDao extends BaseDao implements ICrud<Contato>{
         comando.setString(1, entidade.getNome());
         comando.setString(2, entidade.getEmail());
         comando.setString(3, entidade.getTelefone());
-        Date data = new Date(entidade.getDataNascimento().getTimeInMillis());
+        Date data = new Date(entidade.getDataNascimento().getMillis());
         comando.setDate(4, data);
         comando.execute();
         
@@ -68,7 +69,7 @@ public class ContatoDao extends BaseDao implements ICrud<Contato>{
         comando.setString(1, entidade.getNome());
         comando.setString(2, entidade.getEmail());
         comando.setString(3, entidade.getTelefone());
-        Date data = new Date(entidade.getDataNascimento().getTimeInMillis());
+        Date data = new Date(entidade.getDataNascimento().getMillis());
         comando.setDate(4, data);
         comando.setLong(5, entidade.getId());
         comando.execute();
@@ -96,9 +97,7 @@ public class ContatoDao extends BaseDao implements ICrud<Contato>{
             contato.setEmail(resultados.getString("email"));
             contato.setTelefone(resultados.getString("telefone"));
             Date dataSql = resultados.getDate("data_nascimento");
-            Calendar dataNascimento = Calendar.getInstance();
-            dataNascimento.setTime(dataSql);
-            contato.setDataNascimento(dataNascimento);
+            contato.setDataNascimento(new DateTime(dataSql));
             
             contatos.add(contato);
         }
