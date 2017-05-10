@@ -1,7 +1,7 @@
 package br.edu.ifsp.controller;
 
-import br.edu.ifsp.dao.ContatoDao;
-import br.edu.ifsp.model.Contato;
+import br.edu.ifsp.dao.PessoaDao;
+import br.edu.ifsp.model.Pessoa;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import java.util.List;
 import br.edu.ifsp.util.ICrud;
@@ -15,46 +15,46 @@ import javax.mail.internet.AddressException;
  *
  * @author falvojr
  */
-public final class ContatoController implements ICrud<Contato> {
+public final class PessoaController implements ICrud<Pessoa> {
 
     /* INICIO Singleton "Preguicoso" */
-    private static ContatoController instancia;
+    private static PessoaController instancia;
 
-    public static ContatoController getInstancia() {
+    public static PessoaController getInstancia() {
         if (instancia == null) {
-            instancia = new ContatoController();
+            instancia = new PessoaController();
         }
         return instancia;
     }
 
-    private ContatoController() {
+    private PessoaController() {
         super();
     }
 
     /* FIM Singleton "Preguicoso" */
     @Override
-    public void inserir(Contato entidade) throws ExcecaoNegocial {
+    public void inserir(Pessoa entidade) throws ExcecaoNegocial {
         salvar(entidade);
     }
 
     @Override
-    public void alterar(Contato entidade) throws ExcecaoNegocial {
+    public void alterar(Pessoa entidade) throws ExcecaoNegocial {
         salvar(entidade);
     }
 
-    private void salvar(Contato entidade) throws ExcecaoNegocial {
+    private void salvar(Pessoa entidade) throws ExcecaoNegocial {
         try {
-            boolean emailValido = !entidade.getEmail().isEmpty();
-            boolean nomeValido = !entidade.getNome().isEmpty();
-            boolean telefoneValido = !entidade.getTelefone().isEmpty();
+            boolean emailValido = !Validador.ehVazio(entidade.getEmail());
+            boolean nomeValido = !Validador.ehVazio(entidade.getNome());
+            boolean telefoneValido = !Validador.ehVazio(entidade.getTelefone());
             if (emailValido || nomeValido || telefoneValido) {
                 if (emailValido) {
                     Validador.validarEmail(entidade.getEmail());
                 }
                 if (entidade.getId() == null) {
-                    ContatoDao.getInstancia().inserir(entidade);
+                    PessoaDao.getInstancia().inserir(entidade);
                 } else {
-                    ContatoDao.getInstancia().alterar(entidade);
+                    PessoaDao.getInstancia().alterar(entidade);
                 }
             } else {
                 throw new ExcecaoNegocial(Mensagens.CONTATO_ERRO_CAMPOS_OBRIGATORIOS);
@@ -75,9 +75,9 @@ public final class ContatoController implements ICrud<Contato> {
     }
 
     @Override
-    public void deletar(Contato entidade) throws ExcecaoNegocial {
+    public void deletar(Pessoa entidade) throws ExcecaoNegocial {
         try {
-            ContatoDao.getInstancia().deletar(entidade);
+            PessoaDao.getInstancia().deletar(entidade);
         } catch (SQLException sqlException) {
             throw new ExcecaoNegocial(Mensagens.ERRO_BD, sqlException);
         } catch (Exception exception) {
@@ -86,9 +86,9 @@ public final class ContatoController implements ICrud<Contato> {
     }
 
     @Override
-    public List<Contato> listar() throws ExcecaoNegocial {
+    public List<Pessoa> listar() throws ExcecaoNegocial {
         try {
-            return ContatoDao.getInstancia().listar();
+            return PessoaDao.getInstancia().listar();
         } catch (SQLException sqlException) {
             throw new ExcecaoNegocial(Mensagens.ERRO_BD, sqlException);
         } catch (Exception exception) {

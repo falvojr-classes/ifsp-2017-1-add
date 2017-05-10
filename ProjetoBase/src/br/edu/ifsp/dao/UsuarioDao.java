@@ -30,7 +30,7 @@ public class UsuarioDao extends BaseDao {
 
     public boolean autenticar(Usuario usuario) throws SQLException {
         boolean retorno = false;
-        String sql = "SELECT id FROM usuarios WHERE login = ? AND senha = ? "
+        String sql = "SELECT id FROM usuario WHERE login = ? AND senha = ? "
                 + "AND ativo = true";
         PreparedStatement comando = super.getConexao().prepareStatement(sql);
         comando.setString(1, usuario.getLogin());

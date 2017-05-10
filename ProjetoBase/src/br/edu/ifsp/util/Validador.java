@@ -17,4 +17,8 @@ public final class Validador {
     public static void validarEmail(String email) throws AddressException {
         new InternetAddress(email).validate();
     }
+    
+    public static boolean ehVazio(String valor) {
+        return valor == null || valor.isEmpty();
+    }
 }

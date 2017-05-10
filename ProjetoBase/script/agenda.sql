@@ -1,38 +1,52 @@
 CREATE DATABASE agenda;
 USE agenda;
 
-CREATE TABLE contatos (
+CREATE TABLE pessoa (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(50),
     email VARCHAR(50),
     telefone VARCHAR(20),
-    data_nascimento DATE
+    ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
--- INSERT INTO contatos (nome, email, telefone, data_nascimento)  VALUES  ('Venilton', 'falvojr@gmail.com', '999999999', '1989-07-10');
--- 
--- UPDATE contatos SET 
--- nome = 'Venilton FalvoJr',
--- email = '',
--- telefone = '',
--- data_nascimento = '1999-12-10'
--- WHERE id = 1;
--- 
--- DELETE FROM contatos WHERE id = 1;
--- 
--- SELECT * FROM contatos;
+CREATE TABLE pessoa_fisica (
+    id_pf INT NOT NULL PRIMARY KEY,
+    cpf VARCHAR(50) NOT NULL,
+    data_nascimento DATE,
+    CONSTRAINT FK_PF -- Opcional (caso desejar dar um nome especifico)
+    FOREIGN KEY(id_pf) REFERENCES pessoa(id)
+);
 
-CREATE TABLE usuarios ( 
+CREATE TABLE pessoa_juridica (
+    id_pj INT NOT NULL PRIMARY KEY,
+    cnpj VARCHAR(50) NOT NULL,
+    ie VARCHAR(50),
+    CONSTRAINT FK_PJ -- Opcional (caso desejar dar um nome especifico)
+    FOREIGN KEY(id_pj) REFERENCES pessoa(id)
+);
+
+CREATE TABLE usuario ( 
   id int not null primary key auto_increment,
   login varchar(15) unique not null,
   senha varchar(15) not null,
   ativo boolean not null default true
 );
 
-INSERT INTO usuarios (login, senha) 
+INSERT INTO usuario (login, senha) 
 VALUES ('admin', 'admin');
 
-SELECT id FROM usuarios 
-WHERE login = 'admin' 
-AND senha = 'admin'
-AND ativo = true;
+SELECT * FROM pessoa p
+INNER JOIN pessoa_fisica pf ON pf.id_pf = p.id
+INNER JOIN pessoa_juridica pj ON pj.id_pj = p.id
+
+
+
+
+
+
+
+
+
+
+
+

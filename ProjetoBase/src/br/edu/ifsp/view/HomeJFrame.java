@@ -5,7 +5,7 @@
  */
 package br.edu.ifsp.view;
 
-import br.edu.ifsp.controller.ContatoController;
+import br.edu.ifsp.controller.PessoaController;
 import br.edu.ifsp.model.Contato;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import br.edu.ifsp.util.Mensagens;
@@ -134,12 +134,12 @@ public class HomeJFrame extends javax.swing.JFrame {
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         try {
-            Contato entidade = new Contato();
-            entidade.setNome(txtNome.getText());
-            entidade.setEmail(txtEmail.getText());
-            entidade.setTelefone(txtTelefone.getText());
-            entidade.setDataNascimento(new DateTime(txtDataNascimento.getDate()));
-            ContatoController.getInstancia().inserir(entidade);
+//            Contato entidade = new Contato();
+//            entidade.setNome(txtNome.getText());
+//            entidade.setEmail(txtEmail.getText());
+//            entidade.setTelefone(txtTelefone.getText());
+//            entidade.setDataNascimento(new DateTime(txtDataNascimento.getDate()));
+//            PessoaController.getInstancia().inserir(entidade);
             Mensagens.info(this, Mensagens.CONTATO_SUCESSO_INSERCAO);
         } catch(ExcecaoNegocial excecaoNegocial) {
             Mensagens.erro(this, excecaoNegocial);
