@@ -1,10 +1,10 @@
 /**
  * Considerando o método abaixo, execute as seguintes tarefas:
- *     a) Modele um banco de dados considerando as tabelas "pessoa", "pessoa_fisica", "pessoa_juridica";
- * 	   b) Crie as entidades (classes Java) para tais tabelas. Lembre-se de utilizar o conceito de heranca;
- *     c) Inclua o método abaixo em uma classe que implemente o padrão DAO. Adicionalmente, crie um novo
- *        método que liste todas as pessoas (físicas e jurídicas) com seus respectivos CPF/CNPJ;
- *     d) Realize os testes nos dois métodos (via método estático main).
+ *  a) Modele um banco de dados considerando as tabelas "pessoa", "pessoa_fisica", "pessoa_juridica";
+ *  b) Crie as entidades (classes Java) para tais tabelas. Lembre-se de utilizar o conceito de heranca;
+ *  c) Inclua o método abaixo em uma classe que implemente o padrão DAO. Adicionalmente, crie um novo
+ *      método que liste todas as pessoas (físicas e jurídicas) com seus respectivos CPF/CNPJ;
+ *  d) Realize os testes nos dois métodos (via método estático main).
  */
 public void inserir(Pessoa pessoa) throws SQLException {
     String sql = "INSERT INTO pessoa (nome) VALUES (?);";
