@@ -35,9 +35,13 @@ CREATE TABLE usuario (
 INSERT INTO usuario (login, senha) 
 VALUES ('admin', 'admin');
 
-SELECT * FROM pessoa p
-INNER JOIN pessoa_fisica pf ON pf.id_pf = p.id
-INNER JOIN pessoa_juridica pj ON pj.id_pj = p.id
+SELECT 
+p.id, p.nome, p.email, p.telefone, p.ativo, -- pessoa
+pf.cpf, pf.data_nascimento, -- pessoa_fisica
+pj.cnpj, pj.ie -- pessoa_juridica
+FROM pessoa p
+LEFT JOIN pessoa_fisica pf ON pf.id_pf = p.id
+LEFT JOIN pessoa_juridica pj ON pj.id_pj = p.id
 
 
 

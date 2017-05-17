@@ -7,6 +7,7 @@ import br.edu.ifsp.model.Pessoa;
 import br.edu.ifsp.model.PessoaFisica;
 import br.edu.ifsp.model.PessoaJuridica;
 import br.edu.ifsp.util.Validador;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,9 +40,10 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
     /* FIM Singleton "Apressado" */
     @Override
     public void inserir(Pessoa pessoa) throws SQLException {
-        super.getConexao().setAutoCommit(false);
+        final Connection conexao = super.getConexao();
+        conexao.setAutoCommit(false);
         String sql = "INSERT INTO pessoa (nome, email, telefone, ativo) VALUES (?, ?, ?, ?);";
-        PreparedStatement comando = super.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement comando = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         comando.setString(1, pessoa.getNome());
         comando.setString(2, pessoa.getEmail());
         comando.setString(3, pessoa.getTelefone());
@@ -52,32 +54,61 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
         if (pessoa instanceof PessoaFisica) {
             PessoaFisica pf = (PessoaFisica) pessoa;
             sql = "INSERT INTO pessoa_fisica (id_pf, cpf, data_nascimento) VALUES (?, ?, ?);";
-            comando = super.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            comando = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             comando.setLong(1, idPessoa);
             comando.setString(2, pf.getCpf());
-            DateTime dataNascimento = pf.getDataNascimento();
-            comando.setDate(3, dataNascimento == null ? null : new Date(dataNascimento.getMillis()));
+            DateTime dateJoda = pf.getDataNascimento();
+            comando.setDate(3, dateJoda == null ? null : new Date(dateJoda.getMillis()));
         } else {
             PessoaJuridica pj = (PessoaJuridica) pessoa;
             sql = "INSERT INTO pessoa_juridica (id_pj, cnpj, ie) VALUES (?, ?, ?);";
-            comando = super.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            comando = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             comando.setLong(1, idPessoa);
             comando.setString(2, pj.getCnpj());
             comando.setString(3, pj.getInscricaoEstadual());
         }
         comando.execute();
         pessoa.setId(idPessoa);
-        super.getConexao().commit();
+        conexao.commit();
     }
 
     @Override
-    public void alterar(Pessoa entidade) throws SQLException {
-        //TODO Fazer em casa ;)
+    public void alterar(Pessoa pessoa) throws SQLException {
+        final Connection conexao = super.getConexao();
+        conexao.setAutoCommit(false);
+        String sql = "UPDATE pessoa SET nome = ?, email = ?, telefone = ?, ativo = ? WHERE id = ?";
+        PreparedStatement comando = conexao.prepareStatement(sql);
+        comando.setString(1, pessoa.getNome());
+        comando.setString(2, pessoa.getEmail());
+        comando.setString(3, pessoa.getTelefone());
+        comando.setBoolean(4, pessoa.isAtivo());
+        comando.setLong(5, pessoa.getId());
+        comando.execute();
+        comando.close();
+        if (pessoa instanceof PessoaFisica) {
+            PessoaFisica pf = (PessoaFisica) pessoa;
+            sql = "UPDATE pessoa_fisica SET cpf = ?, data_nascimento = ? WHERE id_pf = ?";
+            comando = conexao.prepareStatement(sql);
+            comando.setString(1, pf.getCpf());
+            DateTime dateJoda = pf.getDataNascimento();
+            comando.setDate(2, dateJoda != null ? new Date(dateJoda.getMillis()) : null);
+            comando.setLong(3, pf.getId());
+        } else {
+            PessoaJuridica pj = (PessoaJuridica) pessoa;
+            sql = "UPDATE pessoa_juridica SET cnpj = ?, ie = ? WHERE id_pj = ?";
+            comando = conexao.prepareStatement(sql);
+            comando.setString(1, pj.getCnpj());
+            comando.setString(2, pj.getInscricaoEstadual());
+            comando.setLong(3, pj.getId());            
+        }
+        comando.executeUpdate();
+        conexao.commit();
     }
 
     @Override
     public void deletar(Pessoa entidade) throws SQLException {
-        //TODO Fazer em casa ;)
+        entidade.setAtivo(false);
+        this.alterar(entidade);
     }
 
     @Override
@@ -91,19 +122,32 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             "LEFT JOIN pessoa_fisica pf ON pf.id_pf = p.id " +
             "LEFT JOIN pessoa_juridica pj ON pj.id_pj = p.id;";
         PreparedStatement comando = super.getConexao().prepareStatement(sql);
-        ResultSet resultados = comando.executeQuery();
-        while (resultados.next()) {
-            //TODO Fazer em casa ;)
-            //Preencher os dados comuns (Pessoa)
+        ResultSet rs = comando.executeQuery();
+        while (rs.next()) {
+            //FEITO Fazer em casa ;) 
+            Pessoa pessoa;
             //Preencher os dados especificos:
-            boolean ehPj = Validador.ehVazio(resultados.getString("cpf"));
+            boolean ehPj = Validador.ehVazio(rs.getString("cpf"));
             if (ehPj) {
-                // PessoaJuridica
+                PessoaJuridica pj = new PessoaJuridica();
+                pj.setCnpj(rs.getString("cnpj"));
+                pj.setInscricaoEstadual(rs.getString("ie"));
+                pessoa = pj;
             } else {
-                // PesoaFisica
+                PessoaFisica pf = new PessoaFisica();
+                pf.setCpf(rs.getString("cpf"));
+                Date dateSql = rs.getDate("data_nascimento");
+                pf.setDataNascimento(new DateTime(dateSql));
+                pessoa = pf;
             }
+            //Preencher os dados comuns (Pessoa):
+            pessoa.setId(rs.getLong("id"));
+            pessoa.setEmail(rs.getString("email"));
+            pessoa.setNome(rs.getString("nome"));
+            pessoa.setTelefone(rs.getString("telefone"));
+            pessoa.setAtivo(rs.getBoolean("ativo"));
         }
-        resultados.close();
+        rs.close();
         comando.close();
         return contatos;
     }
