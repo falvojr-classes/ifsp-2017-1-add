@@ -13,6 +13,7 @@ public final class Mensagens {
     public static final String ERRO_BD = "Erro no banco de dados!";
     public static final String ERRO_INESPERADO = "Erro inesperado!";
     public static final String ERRO_EMAIL = "Erro ao validar seu email!";
+    public static final String ERRO_CPF_CNPJ = "Erro ao validar seu documento CPF ou CNPJ!";
     
     public static final String USUARIO_SUCESSO_LOGIN = "Credenciais válidas!";
     public static final String USUARIO_ERRO_LOGIN = "Credenciais inválidas!";
@@ -21,7 +22,7 @@ public final class Mensagens {
     public static final String CONTATO_SUCESSO_INSERCAO = "Contato inserido com sucesso!";
     public static final String CONTATO_SUCESSO_ALTERACAO = "";
     public static final String CONTATO_SUCESSO_EXCLUSAO = "";
-    public static final String CONTATO_ERRO_CAMPOS_OBRIGATORIOS = "Ao menos um campo deve ser preenchido!";
+    public static final String CONTATO_ERRO_CAMPOS_OBRIGATORIOS = "Preencha todos os campos obrigatórios!";
     
     private Mensagens() {
         super();

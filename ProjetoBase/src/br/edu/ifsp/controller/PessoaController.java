@@ -1,7 +1,13 @@
 package br.edu.ifsp.controller;
 
+import br.com.caelum.stella.ValidationMessage;
+import br.com.caelum.stella.validation.CNPJValidator;
+import br.com.caelum.stella.validation.CPFValidator;
+import br.com.caelum.stella.validation.InvalidStateException;
 import br.edu.ifsp.dao.PessoaDao;
 import br.edu.ifsp.model.Pessoa;
+import br.edu.ifsp.model.PessoaFisica;
+import br.edu.ifsp.model.PessoaJuridica;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import java.util.List;
 import br.edu.ifsp.util.ICrud;
@@ -44,20 +50,39 @@ public final class PessoaController implements ICrud<Pessoa> {
 
     private void salvar(Pessoa entidade) throws ExcecaoNegocial {
         try {
-            boolean emailValido = !Validador.ehVazio(entidade.getEmail());
-            boolean nomeValido = !Validador.ehVazio(entidade.getNome());
-            boolean telefoneValido = !Validador.ehVazio(entidade.getTelefone());
-            if (emailValido || nomeValido || telefoneValido) {
-                if (emailValido) {
+            boolean emailVazio = Validador.ehVazio(entidade.getEmail());
+            boolean nomeVazio = Validador.ehVazio(entidade.getNome());
+            boolean telefoneVazio = Validador.ehVazio(entidade.getTelefone());
+            if (emailVazio || nomeVazio || telefoneVazio) {
+                throw new ExcecaoNegocial(Mensagens.CONTATO_ERRO_CAMPOS_OBRIGATORIOS);
+            } else {
+                if (!emailVazio) {
                     Validador.validarEmail(entidade.getEmail());
+                }
+                // Validacao de documentos usando Caelum Stella (Core)
+                // https://github.com/caelum/caelum-stella/wiki
+                if (entidade instanceof PessoaFisica) {
+                    PessoaFisica pf = (PessoaFisica) entidade;
+                    if (Validador.ehVazio(pf.getCpf())) {
+                        throw new ExcecaoNegocial(Mensagens.CONTATO_ERRO_CAMPOS_OBRIGATORIOS);
+                    } else {
+                        CPFValidator validator = new CPFValidator(true);
+                        validator.assertValid(pf.getCpf());
+                    }
+                } else {
+                    PessoaJuridica pj = (PessoaJuridica) entidade;
+                    if (Validador.ehVazio(pj.getCnpj())) {
+                        throw new ExcecaoNegocial(Mensagens.CONTATO_ERRO_CAMPOS_OBRIGATORIOS);
+                    } else {
+                        CNPJValidator validator = new CNPJValidator(true);
+                        validator.assertValid(pj.getCnpj());
+                    }
                 }
                 if (entidade.getId() == null) {
                     PessoaDao.getInstancia().inserir(entidade);
                 } else {
                     PessoaDao.getInstancia().alterar(entidade);
                 }
-            } else {
-                throw new ExcecaoNegocial(Mensagens.CONTATO_ERRO_CAMPOS_OBRIGATORIOS);
             }
         } catch (ExcecaoNegocial ex) {
             // Excecão já foi instanciada corretamente, então somente a propagamos.
@@ -68,6 +93,9 @@ public final class PessoaController implements ICrud<Pessoa> {
         } catch (AddressException ex) {
             // Manipula uma excecão na validacão de email.
             throw new ExcecaoNegocial(Mensagens.ERRO_EMAIL, ex);
+        } catch (InvalidStateException ex) {
+            // Exception lançada quando o documento é inválido
+            throw new ExcecaoNegocial(Mensagens.ERRO_CPF_CNPJ, ex);
         } catch (Exception ex) {
             // Manipula uma excecão genérica.
             throw new ExcecaoNegocial(Mensagens.ERRO_INESPERADO, ex);

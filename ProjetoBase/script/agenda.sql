@@ -42,15 +42,3 @@ pj.cnpj, pj.ie -- pessoa_juridica
 FROM pessoa p
 LEFT JOIN pessoa_fisica pf ON pf.id_pf = p.id
 LEFT JOIN pessoa_juridica pj ON pj.id_pj = p.id
-
-
-
-
-
-
-
-
-
-
-
-

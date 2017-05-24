@@ -40,6 +40,7 @@ public class LoginJFrame extends javax.swing.JFrame {
         lblTitulo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Login");
 
         lblLogin.setText("Login:");
 
@@ -94,6 +95,7 @@ public class LoginJFrame extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
@@ -102,7 +104,8 @@ public class LoginJFrame extends javax.swing.JFrame {
             usuario.setLogin(txtLogin.getText());
             usuario.setSenha(String.valueOf(txtSenha.getPassword()));
             UsuarioController.getInstancia().autenticar(usuario);
-            Mensagens.info(this, Mensagens.USUARIO_SUCESSO_LOGIN);
+            new HomeJFrame(usuario).setVisible(true);
+            super.dispose();
         } catch(ExcecaoNegocial excecaoNegocial) {
             Mensagens.erro(this, excecaoNegocial);
         }

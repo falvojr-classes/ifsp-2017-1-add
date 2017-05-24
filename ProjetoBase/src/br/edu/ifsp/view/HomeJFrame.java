@@ -9,10 +9,9 @@ import br.edu.ifsp.controller.PessoaController;
 import br.edu.ifsp.model.Pessoa;
 import br.edu.ifsp.model.PessoaFisica;
 import br.edu.ifsp.model.PessoaJuridica;
+import br.edu.ifsp.model.Usuario;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import br.edu.ifsp.util.Mensagens;
-import br.edu.ifsp.util.Validador;
-import java.sql.Date;
 import org.joda.time.DateTime;
 
 /**
@@ -21,11 +20,15 @@ import org.joda.time.DateTime;
  */
 public class HomeJFrame extends javax.swing.JFrame {
 
+    private final Usuario usuarioLogado;
+    
     /**
      * Creates new form HomeJFrame
      */
-    public HomeJFrame() {
+    public HomeJFrame(Usuario usuarioLogado) {
+        this.usuarioLogado = usuarioLogado;
         initComponents();
+        super.setTitle(String.format("Home (%s)", usuarioLogado.getLogin()));
     }
 
     /**
@@ -59,12 +62,13 @@ public class HomeJFrame extends javax.swing.JFrame {
         btnSalvar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Home");
 
         pnlPessoa.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados do Contato"));
 
         chkAtivo.setText("Ativo?");
 
-        lblCpf.setText("CPF:");
+        lblCpf.setText("CPF*:");
 
         try {
             txtCpf.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###-##")));
@@ -107,7 +111,7 @@ public class HomeJFrame extends javax.swing.JFrame {
 
         pnlPfPj.addTab("Pessoa Fisica", pnlPf);
 
-        lblCnpj.setText("CNPJ:");
+        lblCnpj.setText("CNPJ*:");
 
         try {
             txtCnpj.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("##.###.###/####-##")));
@@ -135,7 +139,7 @@ public class HomeJFrame extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtIe)
-                    .addComponent(txtCnpj, javax.swing.GroupLayout.DEFAULT_SIZE, 466, Short.MAX_VALUE))
+                    .addComponent(txtCnpj, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
                 .addContainerGap())
         );
         PnlPjLayout.setVerticalGroup(
@@ -154,14 +158,14 @@ public class HomeJFrame extends javax.swing.JFrame {
 
         pnlPfPj.addTab("Pessoa Juridica", PnlPj);
 
-        lblNome.setText("Nome:");
+        lblNome.setText("Nome*:");
 
-        lblEmail.setText("Email:");
+        lblEmail.setText("Email*:");
 
-        lblTelefone.setText("Telefone:");
+        lblTelefone.setText("Telefone*:");
 
         try {
-            txtTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("(##) #-####-####")));
+            txtTelefone.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("(##) #####-####")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -215,9 +219,9 @@ public class HomeJFrame extends javax.swing.JFrame {
                     .addComponent(chkAtivo))
                 .addGap(18, 18, 18)
                 .addComponent(pnlPfPj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSalvar)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -231,13 +235,14 @@ public class HomeJFrame extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlPessoa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(pnlPessoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
@@ -247,65 +252,27 @@ public class HomeJFrame extends javax.swing.JFrame {
             boolean ehPj = pnlPfPj.getSelectedIndex() == 1;
             if (ehPj) {
                 PessoaJuridica pj = new PessoaJuridica();
-                pj.setCnpj(txtCnpj.getText());
+                pj.setCnpj((String) txtCnpj.getValue());
                 pj.setInscricaoEstadual(txtIe.getText());
                 pessoa = pj;
             } else {
                 PessoaFisica pf = new PessoaFisica();
-                pf.setCpf(txtCpf.getText());
+                pf.setCpf((String) txtCpf.getValue());
                 pf.setDataNascimento(new DateTime(txtDataNascimento.getDate()));
                 pessoa = pf;
             }
             //Preencher os dados comuns (Pessoa):
             pessoa.setEmail(txtEmail.getText());
             pessoa.setNome(txtNome.getText());
-            pessoa.setTelefone(txtTelefone.getText());
+            pessoa.setTelefone((String) txtTelefone.getValue());
             pessoa.setAtivo(chkAtivo.isSelected());
             PessoaController.getInstancia().inserir(pessoa);
-            
-            pessoa.setNome("Alterado!");
-            PessoaController.getInstancia().alterar(pessoa);
             
             Mensagens.info(this, Mensagens.CONTATO_SUCESSO_INSERCAO);
         } catch(ExcecaoNegocial excecaoNegocial) {
             Mensagens.erro(this, excecaoNegocial);
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(HomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(HomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(HomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(HomeJFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new HomeJFrame().setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PnlPj;
