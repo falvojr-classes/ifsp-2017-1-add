@@ -96,7 +96,7 @@
           <Font name="Noto Sans" size="24" style="1"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="Login"/>
+        <Property name="text" type="java.lang.String" value="Sistema de Contatos"/>
       </Properties>
     </Component>
   </SubComponents>

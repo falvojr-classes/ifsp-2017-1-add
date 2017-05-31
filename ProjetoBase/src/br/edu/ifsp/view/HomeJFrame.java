@@ -12,6 +12,11 @@ import br.edu.ifsp.model.PessoaJuridica;
 import br.edu.ifsp.model.Usuario;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import br.edu.ifsp.util.Mensagens;
+import java.util.Date;
+import java.util.List;
+import javax.swing.JFormattedTextField;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import org.joda.time.DateTime;
 
 /**
@@ -21,6 +26,7 @@ import org.joda.time.DateTime;
 public class HomeJFrame extends javax.swing.JFrame {
 
     private final Usuario usuarioLogado;
+    private PessoaTableModel tableModel;
     
     /**
      * Creates new form HomeJFrame
@@ -28,9 +34,65 @@ public class HomeJFrame extends javax.swing.JFrame {
     public HomeJFrame(Usuario usuarioLogado) {
         this.usuarioLogado = usuarioLogado;
         initComponents();
-        super.setTitle(String.format("Home (%s)", usuarioLogado.getLogin()));
+        initMyComponents();
     }
-
+    
+    private void initMyComponents() {
+        super.setTitle(String.format("Home (%s)", usuarioLogado.getLogin()));     
+        this.atualizarTabela();
+        tblPessoas.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
+                final int selectedRow = tblPessoas.getSelectedRow();
+                // Condicão necessaria para evitar click duplo.
+                if (!event.getValueIsAdjusting() && selectedRow != -1) {
+                    limparCampos();
+                    int row = tblPessoas.convertRowIndexToModel(selectedRow);
+                    Pessoa pessoa = tableModel.getRegistros().get(row);
+                    txtId.setText(pessoa.getId().toString());
+                    txtNome.setText(pessoa.getNome());
+                    txtEmail.setText(pessoa.getEmail());
+                    txtTelefone.setText(pessoa.getTelefone());
+                    if (pessoa instanceof PessoaFisica) {
+                        txtCpf.setText(((PessoaFisica) pessoa).getCpf());
+                        final DateTime data = ((PessoaFisica) pessoa).getDataNascimento();
+                        txtDataNascimento.setDate(new Date(data.getMillis()));
+                        pnlPfPj.setSelectedIndex(0);
+                    } else {
+                        txtCnpj.setText(((PessoaJuridica) pessoa).getCnpj());
+                        txtIe.setText(((PessoaJuridica) pessoa).getInscricaoEstadual());
+                        pnlPfPj.setSelectedIndex(1);
+                    }
+                }
+            }
+        });
+    }
+    
+    private void limparCampos() {
+        txtNome.setText("");
+        txtEmail.setText("");
+        txtTelefone.setText("");
+        txtCpf.setText("");
+        txtDataNascimento.setDate(null);
+        txtCnpj.setText("");
+        txtIe.setText("");
+        pnlPfPj.setSelectedIndex(0);
+    }
+    
+    private void atualizarTabela() {
+        List<Pessoa> pessoas = PessoaController.getInstancia().listar();
+        if (tableModel == null) {
+            // Intanciando (1 vez)
+            tableModel = new PessoaTableModel(pessoas);
+            tblPessoas.setModel(tableModel); 
+        } else {
+            // Atualizando (demais vezes)
+            tableModel.setRegistros(pessoas);
+            tableModel.fireTableDataChanged();
+        }
+        
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -60,12 +122,19 @@ public class HomeJFrame extends javax.swing.JFrame {
         lblTelefone = new javax.swing.JLabel();
         txtTelefone = new javax.swing.JFormattedTextField();
         btnSalvar = new javax.swing.JButton();
+        txtId = new javax.swing.JTextField();
+        lblId = new javax.swing.JLabel();
+        pnlPessoas = new javax.swing.JScrollPane();
+        tblPessoas = new javax.swing.JTable();
+        btnExcluir = new javax.swing.JButton();
+        btnExportar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Home");
 
         pnlPessoa.setBorder(javax.swing.BorderFactory.createTitledBorder("Dados do Contato"));
 
+        chkAtivo.setSelected(true);
         chkAtivo.setText("Ativo?");
 
         lblCpf.setText("CPF*:");
@@ -122,7 +191,7 @@ public class HomeJFrame extends javax.swing.JFrame {
         lblIe.setText("IE:");
 
         try {
-            txtIe.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("")));
+            txtIe.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.MaskFormatter("###.###.###.###")));
         } catch (java.text.ParseException ex) {
             ex.printStackTrace();
         }
@@ -177,6 +246,11 @@ public class HomeJFrame extends javax.swing.JFrame {
             }
         });
 
+        txtId.setEditable(false);
+        txtId.setEnabled(false);
+
+        lblId.setText("ID");
+
         javax.swing.GroupLayout pnlPessoaLayout = new javax.swing.GroupLayout(pnlPessoa);
         pnlPessoa.setLayout(pnlPessoaLayout);
         pnlPessoaLayout.setHorizontalGroup(
@@ -197,7 +271,12 @@ public class HomeJFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chkAtivo))
                             .addComponent(txtEmail)
-                            .addComponent(txtNome)))
+                            .addGroup(pnlPessoaLayout.createSequentialGroup()
+                                .addComponent(txtNome)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblId)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -207,7 +286,9 @@ public class HomeJFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(pnlPessoaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNome))
+                    .addComponent(lblNome)
+                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblId))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(pnlPessoaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblEmail)
@@ -224,20 +305,54 @@ public class HomeJFrame extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        tblPessoas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        pnlPessoas.setViewportView(tblPessoas);
+
+        btnExcluir.setText("Excluir");
+
+        btnExportar.setText("Exportar");
+        btnExportar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExportarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlPessoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlPessoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pnlPessoas)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnExcluir)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnExportar)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(pnlPessoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(pnlPessoa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlPessoas, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnExportar)
+                    .addComponent(btnExcluir))
                 .addContainerGap())
         );
 
@@ -252,48 +367,72 @@ public class HomeJFrame extends javax.swing.JFrame {
             boolean ehPj = pnlPfPj.getSelectedIndex() == 1;
             if (ehPj) {
                 PessoaJuridica pj = new PessoaJuridica();
-                pj.setCnpj((String) txtCnpj.getValue());
-                pj.setInscricaoEstadual(txtIe.getText());
+                pj.setCnpj(getValorCampoMascarado(txtCnpj));
+                pj.setInscricaoEstadual(getValorCampoMascarado(txtIe));
                 pessoa = pj;
             } else {
                 PessoaFisica pf = new PessoaFisica();
-                pf.setCpf((String) txtCpf.getValue());
+                pf.setCpf(getValorCampoMascarado(txtCpf));
                 pf.setDataNascimento(new DateTime(txtDataNascimento.getDate()));
                 pessoa = pf;
             }
             //Preencher os dados comuns (Pessoa):
             pessoa.setEmail(txtEmail.getText());
             pessoa.setNome(txtNome.getText());
-            pessoa.setTelefone((String) txtTelefone.getValue());
+            pessoa.setTelefone(getValorCampoMascarado(txtTelefone));
             pessoa.setAtivo(chkAtivo.isSelected());
-            PessoaController.getInstancia().inserir(pessoa);
-            
+            if (txtId.getText().isEmpty()) {
+                PessoaController.getInstancia().inserir(pessoa);
+            } else {
+                pessoa.setId(Long.valueOf(txtId.getText()));
+                PessoaController.getInstancia().alterar(pessoa);
+            }
+            this.atualizarTabela();
             Mensagens.info(this, Mensagens.CONTATO_SUCESSO_INSERCAO);
         } catch(ExcecaoNegocial excecaoNegocial) {
             Mensagens.erro(this, excecaoNegocial);
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
 
+    private String getValorCampoMascarado(JFormattedTextField campo) {
+        String valor = (String) campo.getValue();
+        if (valor == null) {
+            valor = campo.getText();
+        }
+        return valor;
+    }
+    
+    private void btnExportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnExportarActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PnlPj;
+    private javax.swing.JButton btnExcluir;
+    private javax.swing.JButton btnExportar;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JCheckBox chkAtivo;
     private javax.swing.JLabel lblCnpj;
     private javax.swing.JLabel lblCpf;
     private javax.swing.JLabel lblEmail;
+    private javax.swing.JLabel lblId;
     private javax.swing.JLabel lblIe;
     private javax.swing.JLabel lblNascimento;
     private javax.swing.JLabel lblNome;
     private javax.swing.JLabel lblTelefone;
     private javax.swing.JPanel pnlPessoa;
+    private javax.swing.JScrollPane pnlPessoas;
     private javax.swing.JPanel pnlPf;
     private javax.swing.JTabbedPane pnlPfPj;
+    private javax.swing.JTable tblPessoas;
     private javax.swing.JFormattedTextField txtCnpj;
     private javax.swing.JFormattedTextField txtCpf;
     private com.toedter.calendar.JDateChooser txtDataNascimento;
     private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtId;
     private javax.swing.JFormattedTextField txtIe;
     private javax.swing.JTextField txtNome;
     private javax.swing.JFormattedTextField txtTelefone;
     // End of variables declaration//GEN-END:variables
+
 }

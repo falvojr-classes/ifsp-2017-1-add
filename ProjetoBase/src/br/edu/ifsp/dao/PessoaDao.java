@@ -93,15 +93,21 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             DateTime dateJoda = pf.getDataNascimento();
             comando.setDate(2, dateJoda != null ? new Date(dateJoda.getMillis()) : null);
             comando.setLong(3, pf.getId());
+            int linhasAfetadas = comando.executeUpdate();
+            //TODO Tratar troca de tipo (fisica -> jurídica)
+            if (linhasAfetadas == 0) {
+                //TODO Excluir i registro em pessoa_juridica
+                this.inserir(pessoa);
+            }
         } else {
             PessoaJuridica pj = (PessoaJuridica) pessoa;
             sql = "UPDATE pessoa_juridica SET cnpj = ?, ie = ? WHERE id_pj = ?";
             comando = conexao.prepareStatement(sql);
             comando.setString(1, pj.getCnpj());
             comando.setString(2, pj.getInscricaoEstadual());
-            comando.setLong(3, pj.getId());            
+            comando.setLong(3, pj.getId());    
+            comando.executeUpdate();        
         }
-        comando.executeUpdate();
         conexao.commit();
     }
 
@@ -113,7 +119,7 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
 
     @Override
     public List<Pessoa> listar() throws SQLException {
-        List<Pessoa> contatos = new ArrayList<>();
+        List<Pessoa> pessoas = new ArrayList<>();
         String sql = "SELECT " +
                 "p.id, p.nome, p.email, p.telefone, p.ativo," +
                 "pf.cpf, pf.data_nascimento," +
@@ -146,10 +152,11 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             pessoa.setNome(rs.getString("nome"));
             pessoa.setTelefone(rs.getString("telefone"));
             pessoa.setAtivo(rs.getBoolean("ativo"));
+            pessoas.add(pessoa);
         }
         rs.close();
         comando.close();
-        return contatos;
+        return pessoas;
     }
 
 }

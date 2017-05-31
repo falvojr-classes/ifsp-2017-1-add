@@ -5,6 +5,7 @@ import br.com.caelum.stella.validation.CNPJValidator;
 import br.com.caelum.stella.validation.CPFValidator;
 import br.com.caelum.stella.validation.InvalidStateException;
 import br.edu.ifsp.dao.PessoaDao;
+import br.edu.ifsp.model.TipoPagamento;
 import br.edu.ifsp.model.Pessoa;
 import br.edu.ifsp.model.PessoaFisica;
 import br.edu.ifsp.model.PessoaJuridica;

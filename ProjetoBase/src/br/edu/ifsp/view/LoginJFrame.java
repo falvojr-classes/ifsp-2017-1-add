@@ -55,7 +55,7 @@ public class LoginJFrame extends javax.swing.JFrame {
 
         lblTitulo.setFont(new java.awt.Font("Noto Sans", 1, 24)); // NOI18N
         lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblTitulo.setText("Login");
+        lblTitulo.setText("Sistema de Contatos");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
