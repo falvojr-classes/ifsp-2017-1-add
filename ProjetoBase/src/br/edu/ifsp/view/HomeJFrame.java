@@ -15,6 +15,7 @@ import br.edu.ifsp.util.Mensagens;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.joda.time.DateTime;
@@ -53,6 +54,7 @@ public class HomeJFrame extends javax.swing.JFrame {
                     txtNome.setText(pessoa.getNome());
                     txtEmail.setText(pessoa.getEmail());
                     txtTelefone.setText(pessoa.getTelefone());
+                    chkAtivo.setSelected(pessoa.isAtivo());
                     if (pessoa instanceof PessoaFisica) {
                         txtCpf.setText(((PessoaFisica) pessoa).getCpf());
                         final DateTime data = ((PessoaFisica) pessoa).getDataNascimento();
@@ -63,6 +65,7 @@ public class HomeJFrame extends javax.swing.JFrame {
                         txtIe.setText(((PessoaJuridica) pessoa).getInscricaoEstadual());
                         pnlPfPj.setSelectedIndex(1);
                     }
+                    btnExcluir.setEnabled(true);
                 }
             }
         });
@@ -86,9 +89,11 @@ public class HomeJFrame extends javax.swing.JFrame {
             tableModel = new PessoaTableModel(pessoas);
             tblPessoas.setModel(tableModel); 
         } else {
+            final int selectedRow = tblPessoas.getSelectedRow();
             // Atualizando (demais vezes)
             tableModel.setRegistros(pessoas);
             tableModel.fireTableDataChanged();
+            tblPessoas.setRowSelectionInterval(selectedRow, selectedRow);
         }
         
     }
@@ -110,7 +115,7 @@ public class HomeJFrame extends javax.swing.JFrame {
         txtCpf = new javax.swing.JFormattedTextField();
         txtDataNascimento = new com.toedter.calendar.JDateChooser();
         lblNascimento = new javax.swing.JLabel();
-        PnlPj = new javax.swing.JPanel();
+        pnlPj = new javax.swing.JPanel();
         lblCnpj = new javax.swing.JLabel();
         txtCnpj = new javax.swing.JFormattedTextField();
         lblIe = new javax.swing.JLabel();
@@ -124,6 +129,7 @@ public class HomeJFrame extends javax.swing.JFrame {
         btnSalvar = new javax.swing.JButton();
         txtId = new javax.swing.JTextField();
         lblId = new javax.swing.JLabel();
+        btnLimpar = new javax.swing.JButton();
         pnlPessoas = new javax.swing.JScrollPane();
         tblPessoas = new javax.swing.JTable();
         btnExcluir = new javax.swing.JButton();
@@ -196,36 +202,36 @@ public class HomeJFrame extends javax.swing.JFrame {
             ex.printStackTrace();
         }
 
-        javax.swing.GroupLayout PnlPjLayout = new javax.swing.GroupLayout(PnlPj);
-        PnlPj.setLayout(PnlPjLayout);
-        PnlPjLayout.setHorizontalGroup(
-            PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PnlPjLayout.createSequentialGroup()
+        javax.swing.GroupLayout pnlPjLayout = new javax.swing.GroupLayout(pnlPj);
+        pnlPj.setLayout(pnlPjLayout);
+        pnlPjLayout.setHorizontalGroup(
+            pnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPjLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lblCnpj)
                     .addComponent(lblIe))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtIe)
                     .addComponent(txtCnpj, javax.swing.GroupLayout.DEFAULT_SIZE, 458, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        PnlPjLayout.setVerticalGroup(
-            PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(PnlPjLayout.createSequentialGroup()
+        pnlPjLayout.setVerticalGroup(
+            pnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPjLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addGroup(pnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(txtCnpj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblCnpj))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(PnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                .addGroup(pnlPjLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(lblIe)
                     .addComponent(txtIe, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        pnlPfPj.addTab("Pessoa Juridica", PnlPj);
+        pnlPfPj.addTab("Pessoa Juridica", pnlPj);
 
         lblNome.setText("Nome*:");
 
@@ -250,6 +256,13 @@ public class HomeJFrame extends javax.swing.JFrame {
         txtId.setEnabled(false);
 
         lblId.setText("ID");
+
+        btnLimpar.setText("Limpar");
+        btnLimpar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimparActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout pnlPessoaLayout = new javax.swing.GroupLayout(pnlPessoa);
         pnlPessoa.setLayout(pnlPessoaLayout);
@@ -277,7 +290,10 @@ public class HomeJFrame extends javax.swing.JFrame {
                                 .addComponent(lblId)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addComponent(btnSalvar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPessoaLayout.createSequentialGroup()
+                        .addComponent(btnLimpar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         pnlPessoaLayout.setVerticalGroup(
@@ -301,7 +317,9 @@ public class HomeJFrame extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(pnlPfPj, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnSalvar)
+                .addGroup(pnlPessoaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnSalvar)
+                    .addComponent(btnLimpar))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -319,6 +337,12 @@ public class HomeJFrame extends javax.swing.JFrame {
         pnlPessoas.setViewportView(tblPessoas);
 
         btnExcluir.setText("Excluir");
+        btnExcluir.setEnabled(false);
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
+            }
+        });
 
         btnExportar.setText("Exportar");
         btnExportar.addActionListener(new java.awt.event.ActionListener() {
@@ -337,9 +361,9 @@ public class HomeJFrame extends javax.swing.JFrame {
                     .addComponent(pnlPessoa, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(pnlPessoas)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnExcluir)
+                        .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnExportar)))
+                        .addComponent(btnExportar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -388,7 +412,7 @@ public class HomeJFrame extends javax.swing.JFrame {
                 PessoaController.getInstancia().alterar(pessoa);
             }
             this.atualizarTabela();
-            Mensagens.info(this, Mensagens.CONTATO_SUCESSO_INSERCAO);
+            Mensagens.info(this, Mensagens.PESSOA_SUCESSO_INSERCAO);
         } catch(ExcecaoNegocial excecaoNegocial) {
             Mensagens.erro(this, excecaoNegocial);
         }
@@ -406,10 +430,28 @@ public class HomeJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btnExportarActionPerformed
 
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        try {
+            String msg = String.format(Mensagens.PESSOA_CONFIRMAR_EXCLUSAO, txtNome.getText());
+            int resposta = JOptionPane.showConfirmDialog(this, msg, "Confirmacão", JOptionPane.YES_NO_OPTION);
+            if (resposta == JOptionPane.YES_OPTION) {
+                Long idPessoa = Long.parseLong(txtId.getText());
+                PessoaController.getInstancia().deletar(idPessoa);
+                this.atualizarTabela();
+            }
+        } catch(ExcecaoNegocial excecaoNegocial) {
+            Mensagens.erro(this, excecaoNegocial);
+        }
+    }//GEN-LAST:event_btnExcluirActionPerformed
+
+    private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
+        limparCampos();
+    }//GEN-LAST:event_btnLimparActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel PnlPj;
     private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnExportar;
+    private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JCheckBox chkAtivo;
     private javax.swing.JLabel lblCnpj;
@@ -424,6 +466,7 @@ public class HomeJFrame extends javax.swing.JFrame {
     private javax.swing.JScrollPane pnlPessoas;
     private javax.swing.JPanel pnlPf;
     private javax.swing.JTabbedPane pnlPfPj;
+    private javax.swing.JPanel pnlPj;
     private javax.swing.JTable tblPessoas;
     private javax.swing.JFormattedTextField txtCnpj;
     private javax.swing.JFormattedTextField txtCpf;

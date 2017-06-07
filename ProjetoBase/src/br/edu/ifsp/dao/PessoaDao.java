@@ -52,24 +52,36 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
         Long idPessoa = super.getIdGerado(comando);
         comando.close();
         if (pessoa instanceof PessoaFisica) {
-            PessoaFisica pf = (PessoaFisica) pessoa;
-            sql = "INSERT INTO pessoa_fisica (id_pf, cpf, data_nascimento) VALUES (?, ?, ?);";
-            comando = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            comando.setLong(1, idPessoa);
-            comando.setString(2, pf.getCpf());
-            DateTime dateJoda = pf.getDataNascimento();
-            comando.setDate(3, dateJoda == null ? null : new Date(dateJoda.getMillis()));
+            inserirPf(pessoa, idPessoa);
         } else {
-            PessoaJuridica pj = (PessoaJuridica) pessoa;
-            sql = "INSERT INTO pessoa_juridica (id_pj, cnpj, ie) VALUES (?, ?, ?);";
-            comando = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            comando.setLong(1, idPessoa);
-            comando.setString(2, pj.getCnpj());
-            comando.setString(3, pj.getInscricaoEstadual());
+            inserirPj(pessoa, idPessoa);
         }
         comando.execute();
         pessoa.setId(idPessoa);
         conexao.commit();
+    }
+
+    private void inserirPj(Pessoa pessoa, Long idPessoa) throws SQLException {
+        PessoaJuridica pj = (PessoaJuridica) pessoa;
+        String sql = "INSERT INTO pessoa_juridica (id_pj, cnpj, ie) VALUES (?, ?, ?);";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setLong(1, idPessoa);
+        comando.setString(2, pj.getCnpj());
+        comando.setString(3, pj.getInscricaoEstadual());
+        comando.execute();
+        comando.close();
+    }
+
+    private void inserirPf(Pessoa pessoa, Long idPessoa) throws SQLException {
+        PessoaFisica pf = (PessoaFisica) pessoa;
+        String sql = "INSERT INTO pessoa_fisica (id_pf, cpf, data_nascimento) VALUES (?, ?, ?);";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setLong(1, idPessoa);
+        comando.setString(2, pf.getCpf());
+        DateTime dateJoda = pf.getDataNascimento();
+        comando.setDate(3, dateJoda == null ? null : new Date(dateJoda.getMillis()));
+        comando.execute();
+        comando.close();
     }
 
     @Override
@@ -97,7 +109,9 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             //TODO Tratar troca de tipo (fisica -> jurídica)
             if (linhasAfetadas == 0) {
                 //TODO Excluir i registro em pessoa_juridica
-                this.inserir(pessoa);
+                
+                //FEITO Inserir pessoa_fisica
+                this.inserirPf(pessoa, pessoa.getId());
             }
         } else {
             PessoaJuridica pj = (PessoaJuridica) pessoa;
@@ -106,15 +120,25 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             comando.setString(1, pj.getCnpj());
             comando.setString(2, pj.getInscricaoEstadual());
             comando.setLong(3, pj.getId());    
-            comando.executeUpdate();        
+            int linhasAfetadas = comando.executeUpdate();
+            //TODO Tratar troca de tipo (jurica -> fisica)
+            if (linhasAfetadas == 0) {
+                //TODO Excluir i registro em pessoa_fisica
+                
+                //FEITO Inserir pessoa_juridica
+                this.inserirPj(pessoa, pessoa.getId());
+            }
         }
         conexao.commit();
     }
 
     @Override
-    public void deletar(Pessoa entidade) throws SQLException {
-        entidade.setAtivo(false);
-        this.alterar(entidade);
+    public void deletar(Long id) throws SQLException {
+        String sql = "UPDATE pessoa SET ativo = false WHERE id = ?";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setLong(1, id);
+        comando.execute();
+        comando.close();
     }
 
     @Override

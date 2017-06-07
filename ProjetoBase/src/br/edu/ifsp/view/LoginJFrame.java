@@ -9,6 +9,8 @@ import br.edu.ifsp.controller.UsuarioController;
 import br.edu.ifsp.model.Usuario;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import br.edu.ifsp.util.Mensagens;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
@@ -21,6 +23,13 @@ public class LoginJFrame extends javax.swing.JFrame {
      */
     public LoginJFrame() {
         initComponents();
+        ActionListener action = new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                btnLoginActionPerformed(e);
+            }
+        };
+        txtLogin.addActionListener(action);
+        txtSenha.addActionListener(action);
     }
 
     /**
