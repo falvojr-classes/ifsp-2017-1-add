@@ -12,8 +12,13 @@ import br.edu.ifsp.model.PessoaJuridica;
 import br.edu.ifsp.model.Usuario;
 import br.edu.ifsp.util.ExcecaoNegocial;
 import br.edu.ifsp.util.Mensagens;
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
@@ -457,10 +462,16 @@ public class HomeJFrame extends javax.swing.JFrame {
             final JasperPrint print = JasperFillManager.fillReport(report, null, new JRBeanCollectionDataSource(dados, false));
             JasperExportManager.exportReportToPdfFile(print, "relatorios/contatos.pdf");
             JOptionPane.showMessageDialog(this, Mensagens.JR_SUCESSO, "Mensagem", JOptionPane.INFORMATION_MESSAGE);
-        } catch (JRException jasperException) {
+            this.abrirPdf();
+        } catch (JRException | IOException jasperException) {
             Mensagens.erro(this, new ExcecaoNegocial(Mensagens.JR_ERRO, jasperException));
         }
     }//GEN-LAST:event_btnExportarActionPerformed
+
+    private void abrirPdf() throws IOException {
+        String path = System.getProperty("user.dir");
+        Desktop.getDesktop().open(new File(path + "/relatorios/contatos.pdf"));
+    }
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
         try {
