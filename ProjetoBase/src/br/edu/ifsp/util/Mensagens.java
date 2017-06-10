@@ -24,6 +24,8 @@ public final class Mensagens {
     public static final String PESSOA_CONFIRMAR_EXCLUSAO = "Deseja realmente excluir %s?";
     public static final String PESSOA_ERRO_CAMPOS_OBRIGATORIOS = "Preencha todos os campos obrigatórios!";
     
+    public static final String JR_SUCESSO = "Exportado com sucesso! Olhe a pasta '/relatorios'.";
+    public static final String JR_ERRO = "Erro ao exportar, veja o log!";
     private Mensagens() {
         super();
     }

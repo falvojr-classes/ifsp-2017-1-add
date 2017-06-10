@@ -16,8 +16,16 @@ import java.util.Date;
 import java.util.List;
 import javax.swing.JFormattedTextField;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.joda.time.DateTime;
 
 /**
@@ -72,6 +80,7 @@ public class HomeJFrame extends javax.swing.JFrame {
     }
     
     private void limparCampos() {
+        txtId.setText("");
         txtNome.setText("");
         txtEmail.setText("");
         txtTelefone.setText("");
@@ -83,19 +92,20 @@ public class HomeJFrame extends javax.swing.JFrame {
     }
     
     private void atualizarTabela() {
-        List<Pessoa> pessoas = PessoaController.getInstancia().listar();
+        List<Pessoa> pessoas = PessoaController.getInstancia().listar(null);
+        atualizarTabela(pessoas);
+    }
+
+    private void atualizarTabela(List<Pessoa> pessoas) {
         if (tableModel == null) {
             // Intanciando (1 vez)
             tableModel = new PessoaTableModel(pessoas);
             tblPessoas.setModel(tableModel); 
         } else {
-            final int selectedRow = tblPessoas.getSelectedRow();
             // Atualizando (demais vezes)
             tableModel.setRegistros(pessoas);
             tableModel.fireTableDataChanged();
-            tblPessoas.setRowSelectionInterval(selectedRow, selectedRow);
-        }
-        
+        }  
     }
     
     /**
@@ -134,6 +144,7 @@ public class HomeJFrame extends javax.swing.JFrame {
         tblPessoas = new javax.swing.JTable();
         btnExcluir = new javax.swing.JButton();
         btnExportar = new javax.swing.JButton();
+        txtFiltro = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Home");
@@ -351,6 +362,15 @@ public class HomeJFrame extends javax.swing.JFrame {
             }
         });
 
+        txtFiltro.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtFiltroKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtFiltroKeyReleased(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -363,7 +383,8 @@ public class HomeJFrame extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnExportar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(btnExportar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtFiltro))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -372,7 +393,9 @@ public class HomeJFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(pnlPessoa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlPessoas, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
+                .addComponent(txtFiltro, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlPessoas, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnExportar)
@@ -427,7 +450,16 @@ public class HomeJFrame extends javax.swing.JFrame {
     }
     
     private void btnExportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExportarActionPerformed
-        // TODO add your handling code here:
+        try {
+            final List<Pessoa> dados = tableModel.getRegistros();
+
+            final JasperReport report = JasperCompileManager.compileReport("relatorios/contatos.jrxml");
+            final JasperPrint print = JasperFillManager.fillReport(report, null, new JRBeanCollectionDataSource(dados, false));
+            JasperExportManager.exportReportToPdfFile(print, "relatorios/contatos.pdf");
+            JOptionPane.showMessageDialog(this, Mensagens.JR_SUCESSO, "Mensagem", JOptionPane.INFORMATION_MESSAGE);
+        } catch (JRException jasperException) {
+            Mensagens.erro(this, new ExcecaoNegocial(Mensagens.JR_ERRO, jasperException));
+        }
     }//GEN-LAST:event_btnExportarActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
@@ -447,6 +479,16 @@ public class HomeJFrame extends javax.swing.JFrame {
     private void btnLimparActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimparActionPerformed
         limparCampos();
     }//GEN-LAST:event_btnLimparActionPerformed
+
+    private void txtFiltroKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyPressed
+
+    }//GEN-LAST:event_txtFiltroKeyPressed
+
+    private void txtFiltroKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtFiltroKeyReleased
+        JTextField filtro = (JTextField) evt.getSource();
+        List<Pessoa> pessoasFiltradas = PessoaController.getInstancia().listar(filtro.getText());
+        atualizarTabela(pessoasFiltradas);
+    }//GEN-LAST:event_txtFiltroKeyReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnExcluir;
@@ -472,6 +514,7 @@ public class HomeJFrame extends javax.swing.JFrame {
     private javax.swing.JFormattedTextField txtCpf;
     private com.toedter.calendar.JDateChooser txtDataNascimento;
     private javax.swing.JTextField txtEmail;
+    private javax.swing.JTextField txtFiltro;
     private javax.swing.JTextField txtId;
     private javax.swing.JFormattedTextField txtIe;
     private javax.swing.JTextField txtNome;

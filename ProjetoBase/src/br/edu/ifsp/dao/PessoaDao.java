@@ -50,15 +50,14 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
         comando.setBoolean(4, pessoa.isAtivo());
         comando.execute();
         Long idPessoa = super.getIdGerado(comando);
-        comando.close();
         if (pessoa instanceof PessoaFisica) {
             inserirPf(pessoa, idPessoa);
         } else {
             inserirPj(pessoa, idPessoa);
         }
-        comando.execute();
         pessoa.setId(idPessoa);
         conexao.commit();
+        comando.close();
     }
 
     private void inserirPj(Pessoa pessoa, Long idPessoa) throws SQLException {
@@ -106,10 +105,10 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             comando.setDate(2, dateJoda != null ? new Date(dateJoda.getMillis()) : null);
             comando.setLong(3, pf.getId());
             int linhasAfetadas = comando.executeUpdate();
-            //TODO Tratar troca de tipo (fisica -> jurídica)
+            //FEITO Tratar troca de tipo (juridica -> fisica)
             if (linhasAfetadas == 0) {
-                //TODO Excluir i registro em pessoa_juridica
-                
+                //FEITO Excluir o registro em pessoa_juridica
+                this.deletarPj(pessoa.getId());        
                 //FEITO Inserir pessoa_fisica
                 this.inserirPf(pessoa, pessoa.getId());
             }
@@ -121,10 +120,10 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
             comando.setString(2, pj.getInscricaoEstadual());
             comando.setLong(3, pj.getId());    
             int linhasAfetadas = comando.executeUpdate();
-            //TODO Tratar troca de tipo (jurica -> fisica)
+            //FEITO Tratar troca de tipo (fisica -> juridica)
             if (linhasAfetadas == 0) {
-                //TODO Excluir i registro em pessoa_fisica
-                
+                //FEITO Excluir o registro em pessoa_fisica
+                this.deletarPf(pessoa.getId());
                 //FEITO Inserir pessoa_juridica
                 this.inserirPj(pessoa, pessoa.getId());
             }
@@ -132,6 +131,22 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
         conexao.commit();
     }
 
+    public void deletarPf(Long id) throws SQLException {
+        String sql = "DELETE FROM pessoa_fisica WHERE id_pf = ?";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setLong(1, id);
+        comando.execute();
+        comando.close();
+    }
+   
+    public void deletarPj(Long id) throws SQLException {
+        String sql = "DELETE FROM pessoa_juridica WHERE id_pj = ?";
+        PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        comando.setLong(1, id);
+        comando.execute();
+        comando.close();
+    }
+    
     @Override
     public void deletar(Long id) throws SQLException {
         String sql = "UPDATE pessoa SET ativo = false WHERE id = ?";
@@ -142,7 +157,7 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
     }
 
     @Override
-    public List<Pessoa> listar() throws SQLException {
+    public List<Pessoa> listar(String filtro) throws SQLException {
         List<Pessoa> pessoas = new ArrayList<>();
         String sql = "SELECT " +
                 "p.id, p.nome, p.email, p.telefone, p.ativo," +
@@ -150,8 +165,16 @@ public class PessoaDao extends BaseDao implements ICrud<Pessoa> {
                 "pj.cnpj, pj.ie " +
             "FROM pessoa p " +
             "LEFT JOIN pessoa_fisica pf ON pf.id_pf = p.id " +
-            "LEFT JOIN pessoa_juridica pj ON pj.id_pj = p.id;";
+            "LEFT JOIN pessoa_juridica pj ON pj.id_pj = p.id ";
+        
+        boolean possuiFiltro = filtro != null;
+        if (possuiFiltro) {
+            sql += "WHERE p.nome LIKE ?";
+        }
         PreparedStatement comando = super.getConexao().prepareStatement(sql);
+        if (possuiFiltro) {
+           comando.setString(1, "%" + filtro + "%");
+        }
         ResultSet rs = comando.executeQuery();
         while (rs.next()) {
             //FEITO Fazer em casa ;) 

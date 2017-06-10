@@ -13,5 +13,5 @@ public interface ICrud<T> {
     void inserir(T entidade) throws SQLException;
     void alterar(T entidade) throws SQLException;
     void deletar(Long id) throws SQLException;
-    List<T> listar() throws SQLException;
+    List<T> listar(String filtro) throws SQLException;
 }

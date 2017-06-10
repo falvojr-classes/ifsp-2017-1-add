@@ -113,9 +113,9 @@ public final class PessoaController implements ICrud<Pessoa> {
     }
 
     @Override
-    public List<Pessoa> listar() throws ExcecaoNegocial {
+    public List<Pessoa> listar(String filtro) {
         try {
-            return PessoaDao.getInstancia().listar();
+            return PessoaDao.getInstancia().listar(filtro);
         } catch (SQLException sqlException) {
             throw new ExcecaoNegocial(Mensagens.ERRO_BD, sqlException);
         } catch (Exception exception) {

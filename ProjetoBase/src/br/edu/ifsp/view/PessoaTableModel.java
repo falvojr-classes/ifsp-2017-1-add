@@ -73,6 +73,10 @@ public class PessoaTableModel extends AbstractTableModel {
                 valorCelula = "";
                 break;
         }
+        if(!pessoa.isAtivo()) {
+            String template = "<html><font color='#B71C1C'>%s</font></html>";
+            valorCelula = String.format(template, valorCelula);
+        }
         return valorCelula;
     }
 
